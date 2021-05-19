@@ -27,6 +27,9 @@ public class AccountsPageTest extends BaseTest{
 	System.out.println("Accounts page title is : " + title);
 		Assert.assertEquals(title, Constants.ACCOUNTS_PAGE_TITLE, Error.ACC_PAGE_TITLE_ERROR);
 		
+		//comments
+		
+		
 	}
 	
 	@Test
