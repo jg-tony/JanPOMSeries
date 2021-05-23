@@ -1,56 +1,65 @@
-pipeline {
+pipeline{
     agent any
+        stages {
+            
+            stage('Build'){
+                
+                steps{
+                    echo "Building"
+                }
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Build the project'
             }
-        }
-        
-        stage('Deploy on DEV') {
-            steps {
-                echo 'Dev Deploy'
+           
+  
+           stage('Test'){
+                
+                steps{
+                   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
+          //for windows ---> use bat :  bat "mvn clean install"                                                
+                    sh "mvn clean install"
+                   }
+
+                }
+
             }
-        }
-        
-        stage('Deploy on QA') {
-            steps {
-                echo 'QA deploy'
+            
+            stage('Publish Allure Reports'){
+                
+                steps{
+                    script{
+                        
+                        allure([
+                                 includeProperties : false,
+                                 jad: '',
+                                 properties: [ ],
+                                 reportBuildPolicy: 'ALWAYS',
+                                 results: [[path: '/allure-results' ]]
+                                                     
+                          ])
+                    }
+
+                
+                }
+
             }
-        }
-        
-            stage('Smoke Test') {
-            steps {
-                echo 'Smoke Test'
+            
+            stage('Publish Exten Report'){
+                
+                steps{
+                    publishHTML([allowMissing: false,
+                                 alwaysLinkToLastBuild : false,
+                                 keepAll : false,
+                                 reportDir: 'build',
+                                 reportFiles: 'TestExecutionReport.html',
+                                 reportName: 'HTML Extent Report',
+                                 reportTitles: '' ])
+                }
+
             }
+           
+       
+
         }
-        
-        stage('Regression Test') {
-            steps {
-                echo 'Regression Test'
-            }
-        }
-        
-        
-            stage('Deploy on Stage') {
-            steps {
-                echo 'Stage deploy'
-            }
-        }
-        
-            stage('Deploy on Prod') {
-            steps {
-                echo 'Prod deploy'
-            }
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-    }
+
+    
 }
